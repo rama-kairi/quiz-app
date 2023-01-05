@@ -1,44 +1,57 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/rama-kairi/quiz-app/data"
+	"github.com/rama-kairi/quiz-app/helpers"
 )
-
-// We need json data for quiz
-
-// We'll as questions from a json file ro the user in the terminal
-
-// Then we'll list all the answer options
-
-// User will enter the answer
-
-// We'll check if the answer is correct or not
-
-// We'll keep track of the score
-
-// At the end we'll show the score
 
 func main() {
 	score := 0
-
 	quizData := data.DataGenerator()
 
-	// TODO: Ask the user to select a topic
-	// TODO: Filter the quizData based on the topic
-	// TODO: Shuffle the questions
-	// TODO: Shuffle the answer options
-	// TODO: Ask the user to select the number of questions
+	// Initiate the quiz
+	fmt.Println("Welcome to the Quiz App!")
+
+	fmt.Println("Please select a topic of your choice: ")
+
+	// Get all the Unique Topics
+	topics := data.GetUniqueTopic(quizData)
+
+	// Print the topics
+	for i, t := range topics {
+		fmt.Printf("%d. %s\n", i+1, t)
+	}
+
+	// Get the user input
+	inputNumTopics := helpers.GetValidInput(len(topics))
+
+	// Get the topic from topics with the index
+	userTopic := topics[inputNumTopics-1]
+
+	// Filter the quizData based on the topic
+	quizDataWithTopic := data.FilterQuizData(quizData, userTopic)
+
+	// Shuffle the questions
+	quizDataWithTopic = helpers.ShuffleMap(quizDataWithTopic)
+
+	// Shuffle the answer options
+	for i, q := range quizDataWithTopic {
+		answer_options := q["answer_options"].([]string)
+		quizDataWithTopic[i]["answer_options"] = helpers.ShuffleArray(answer_options)
+	}
+
+	// Ask the user to select the number of questions
+	fmt.Printf("How many questions do you want to answer? (Max: %d): ", len(quizDataWithTopic))
+	inputNumQuestions := helpers.GetValidInput(len(quizDataWithTopic))
+
+	// Slice the quizDataWithTopic based on the number of questions
+	quizData = quizDataWithTopic[:inputNumQuestions]
 
 	for i, q := range quizData {
 		question := q["question"]
 		answer_options := q["answer_options"].([]string)
-		// correct_answer := q["correct_answer"]
 
 		// Print the question
 		fmt.Printf("Q No %d: %s\n", i+1, question)
@@ -49,27 +62,7 @@ func main() {
 		}
 
 		// Take the user input
-		fmt.Print("Enter your answer: ")
-		reader := bufio.NewReader(os.Stdin)
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-		}
-		input = strings.TrimSpace(input)
-
-		// Convert input to integer
-		inputNum, err := strconv.Atoi(input)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		// TODO: How to handle invalid input and keep asking for input until
-		// the user enters a valid input and  keep on the same question
-
-		if inputNum < 1 || inputNum > len(answer_options) {
-			fmt.Println("Invalid input. Please enter a number between 1 and", len(answer_options))
-			continue
-		}
+		inputNum := helpers.GetValidInput(len(answer_options))
 
 		// Get the correct answer from answer_options with the index
 		correct_answer := answer_options[inputNum-1]
@@ -82,4 +75,7 @@ func main() {
 			fmt.Println("Wrong Answer!")
 		}
 	}
+
+	// Print the score
+	fmt.Printf("Your score is %d out of %d\n", score, len(quizData))
 }

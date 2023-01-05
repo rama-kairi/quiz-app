@@ -311,3 +311,29 @@ func DataGenerator() []map[string]interface{} {
 	}
 	return QuizData
 }
+
+func GetUniqueTopic(quizData []map[string]interface{}) []string {
+	uniqueTopics := make(map[string]int)
+	uniqueTopicsSlice := make([]string, 0)
+
+	for _, quiz := range quizData {
+		topic := quiz["topic"].(string)
+		uniqueTopics[topic]++
+	}
+	for topic := range uniqueTopics {
+		uniqueTopicsSlice = append(uniqueTopicsSlice, topic)
+	}
+	return uniqueTopicsSlice
+}
+
+// FilterQuizData - Filter quiz data based on topic
+func FilterQuizData(quizData []map[string]interface{}, topic string) []map[string]interface{} {
+	filteredData := make([]map[string]interface{}, 0)
+
+	for _, quiz := range quizData {
+		if quiz["topic"] == topic {
+			filteredData = append(filteredData, quiz)
+		}
+	}
+	return filteredData
+}
