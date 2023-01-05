@@ -1,8 +1,12 @@
 package helpers
 
 import (
+	"bufio"
 	"fmt"
 	"math/rand"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -10,12 +14,23 @@ import (
 func GetValidInput(maxNum int) int {
 	for {
 		// Take the user input
+		// fmt.Printf("Enter a number between 1 and %d: ", maxNum)
+		// var inputNum int
+		// _, err := fmt.Scanf("%d", &inputNum)
+		// if err != nil {
+		// 	fmt.Println(err.Error())
+		// 	continue
+		// }
 		fmt.Printf("Enter a number between 1 and %d: ", maxNum)
-		var inputNum int
-		_, err := fmt.Scanf("%d", &inputNum)
+		reader := bufio.NewReader(os.Stdin)
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		inputNum, err := strconv.Atoi(input)
 		if err != nil {
-			fmt.Println(err.Error())
-			continue
+			panic(err)
+			// fmt.Println(err.Error())
+			// continue
 		}
 
 		if inputNum < 1 || inputNum > maxNum {

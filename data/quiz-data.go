@@ -312,6 +312,7 @@ func DataGenerator() []map[string]interface{} {
 	return QuizData
 }
 
+// GetUniqueTopic - Get unique topics from quiz data
 func GetUniqueTopic(quizData []map[string]interface{}) []string {
 	uniqueTopics := make(map[string]int)
 	uniqueTopicsSlice := make([]string, 0)
